@@ -15,9 +15,9 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-from __future__ import annotations
+from __future__ im annotations
 
-import base64
+im base64
 import contextlib
 import os
 import re
@@ -100,7 +100,6 @@ class SparkSubmitHook(BaseHook, LoggingMixin):
 
     conn_name_attr = "conn_id"
     default_conn_name = "spark_default"
-    conn_type = "spark"
     hook_name = "Spark"
 
     @classmethod
@@ -163,6 +162,7 @@ class SparkSubmitHook(BaseHook, LoggingMixin):
         self,
         conf: dict[str, Any] | None = None,
         conn_id: str = "spark_default",
+        conn_type: str = "spark,
         files: str | None = None,
         py_files: str | None = None,
         archives: str | None = None,
@@ -195,6 +195,7 @@ class SparkSubmitHook(BaseHook, LoggingMixin):
         super().__init__()
         self._conf = conf or {}
         self._conn_id = conn_id
+        self._conn_type = conn_type
         self._files = files
         self._py_files = py_files
         self._archives = archives
@@ -268,9 +269,9 @@ class SparkSubmitHook(BaseHook, LoggingMixin):
             # k8s://https://<HOST>:<PORT>
             conn = self.get_connection(self._conn_id)
             if conn.port:
-                conn_data["master"] = f"{conn.host}:{conn.port}"
+                conn_data["master"] = f"{self._conn_type}://{conn.host}:{conn.port}"
             else:
-                conn_data["master"] = conn.host
+                conn_data["master"] = f"{self._conn_type}://{conn.host}"
 
             # Determine optional yarn queue from the extra field
             extra = conn.extra_dejson
@@ -794,7 +795,7 @@ class SparkSubmitHook(BaseHook, LoggingMixin):
 
                 # Currently only instantiate Kubernetes client for killing a spark pod.
                 try:
-                    import kubernetes
+                    im kubernetes
 
                     client = kube_client.get_kube_client()
                     api_response = client.delete_namespaced_pod(
